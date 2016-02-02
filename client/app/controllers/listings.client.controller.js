@@ -62,6 +62,8 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
         address: $scope.address
       };
 
+      
+
       /* Save the article using the Listings factory */
       Listings.create(listing)
               .then(function(response) {
@@ -79,6 +81,27 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
         successfully finished, navigate back to the 'listing.list' state using $state.go(). If an error 
         occurs, pass it to $scope.error. 
        */
+      $scope.error = null;
+      var id = $stateParams.listingId;
+
+      if( !isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'articleForm');
+        return false;
+      }
+      var listing = {
+        name: $scope.name,
+        code: $scope.code,
+        address: $scope.address
+      };
+
+
+
+      Listings.update(id, listing)
+              .then(function(response){
+                $state.go('listings.list', {successMessage: 'Listing Successfully updated.'});
+              }, function(err){
+                $scope.error = 'Unable to update listing \n' + error;
+              });
     };
 
     $scope.remove = function() {
@@ -86,6 +109,15 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
         Implement the remove function. If the removal is successful, navigate back to 'listing.list'. Otherwise, 
         display the error. 
        */
+       $scope.error = null;
+    
+      var id = $stateParams.listingId;
+      Listings.delete(id)
+        .then(function(response) {
+          $state.go('listings.list', { successMessage: 'Listing successfully updated!' });
+        }, function(error) {
+          $scope.error = 'Unable to remove liisting!\n' + error;
+        });
     };
 
     /* Bind the success message to the scope if it exists as part of the current state */
